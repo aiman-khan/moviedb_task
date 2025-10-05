@@ -45,14 +45,14 @@ class MovieDetailsView extends StatelessWidget {
                 ),
               ),
 
-              // Content
+              /// [Content]
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // [Title]
+                      /// [Title]
                       Text(
                         movie.title,
                         style: Theme.of(context).textTheme.headlineSmall
@@ -61,7 +61,7 @@ class MovieDetailsView extends StatelessWidget {
 
                       8.hb,
 
-                      // [Release date & rating row]
+                      /// [Release date & rating row]
                       Row(
                         children: [
                           Icon(
@@ -98,7 +98,7 @@ class MovieDetailsView extends StatelessWidget {
 
                       20.hb,
 
-                      // [Overview]
+                      /// [Overview]
                       Text(
                         "Overview",
                         style: Theme.of(context).textTheme.titleMedium
