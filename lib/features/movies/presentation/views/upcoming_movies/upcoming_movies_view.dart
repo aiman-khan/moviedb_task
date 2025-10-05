@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moviedb_task/core/extensions/num.dart';
 import 'package:moviedb_task/features/movies/presentation/providers/get_upcoming_movies_provider/get_upcoming_movies_provider.dart';
 import 'package:moviedb_task/features/movies/presentation/providers/search_movie_provider/search_movie_provider.dart';
 import 'package:moviedb_task/features/movies/presentation/views/upcoming_movies/widgets/movie_card.dart';
@@ -17,6 +18,7 @@ class _UpcomingMoviesViewState extends ConsumerState<UpcomingMoviesView> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
   bool _isSearching = false;
+  bool _showSearch = false;
 
   @override
   void initState() {
@@ -50,102 +52,134 @@ class _UpcomingMoviesViewState extends ConsumerState<UpcomingMoviesView> {
         : ref.watch(upcomingMoviesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Upcoming Movies",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          /// [Search]
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 8.r),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    style: TextStyle(fontSize: 14.sp),
-                    decoration: InputDecoration(
-                      hintText: "Search movies...",
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      filled: true,
-                      fillColor: Colors.grey.shade200,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 12.h,
-                        horizontal: 16.w,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                        borderSide: BorderSide.none,
-                      ),
+      backgroundColor: Colors.grey.shade100,
+      body: SafeArea(
+        child: Column(
+          children: [
+            /// [Header]
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Watch",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
                     ),
                   ),
-                ),
-                SizedBox(width: 8.w),
-                InkWell(
-                  onTap: () {
-                    final query = _searchController.text.trim();
-                    if (query.isNotEmpty) {
-                      setState(() => _isSearching = true);
-                      ref
-                          .read(searchMoviesProvider.notifier)
-                          .searchMovies(query);
-                    } else {
-                      setState(() => _isSearching = false);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(30.r),
-                  child: Container(
-                    padding: EdgeInsets.all(12.r),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo,
-                      borderRadius: BorderRadius.circular(30.r),
+                  IconButton(
+                    icon: Icon(
+                      _showSearch ? Icons.close : Icons.search,
+                      color: Colors.black87,
                     ),
-                    child: const Icon(Icons.arrow_forward, color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        if (_showSearch) {
+                          _isSearching = false;
+                          _searchController.clear();
+                        }
+                        _showSearch = !_showSearch;
+                      });
+                    },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          /// [Movies]
-          Expanded(
-            child: moviesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Text(
-                  "Something went wrong!\n${e.toString()}",
-                  textAlign: TextAlign.center,
+            /// [Search Bar]
+            if (_showSearch)
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        style: TextStyle(fontSize: 14.sp),
+                        decoration: InputDecoration(
+                          hintText: "Search movies...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Colors.grey,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 12.h,
+                            horizontal: 16.w,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.r),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    8.wb,
+                    InkWell(
+                      onTap: () {
+                        final query = _searchController.text.trim();
+                        if (query.isNotEmpty) {
+                          setState(() => _isSearching = true);
+                          ref
+                              .read(searchMoviesProvider.notifier)
+                              .searchMovies(query);
+                        } else {
+                          setState(() => _isSearching = false);
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(30.r),
+                      child: Container(
+                        padding: EdgeInsets.all(12.r),
+                        decoration: BoxDecoration(
+                          color: Colors.indigo,
+                          borderRadius: BorderRadius.circular(30.r),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              data: (movies) {
-                if (movies.isEmpty) {
-                  return const Center(child: Text("No movies found."));
-                }
 
-                return GridView.builder(
-                  controller: _scrollController,
-                  padding: EdgeInsets.all(12.r),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.65,
-                    crossAxisSpacing: 1,
-                    mainAxisSpacing: 12,
+            /// [Movies]
+            Expanded(
+              child: moviesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Text(
+                    "Something went wrong!\n${e.toString()}",
+                    textAlign: TextAlign.center,
                   ),
-                  itemCount: movies.length,
-                  itemBuilder: (context, index) {
-                    final movie = movies[index];
-                    return MovieCard(movie: movie);
-                  },
-                );
-              },
+                ),
+                data: (movies) {
+                  if (movies.isEmpty) {
+                    return const Center(child: Text("No movies found."));
+                  }
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.all(12.r),
+                    itemCount: movies.length,
+                    itemBuilder: (context, index) {
+                      final movie = movies[index];
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: MovieCard(movie: movie),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:moviedb_task/core/extensions/num.dart';
 import 'package:moviedb_task/core/utils/router/paths.dart';
 import 'package:moviedb_task/features/movies/domain/entities/movie.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,63 +16,54 @@ class MovieCard extends StatelessWidget {
       onTap: () {
         GoRouter.of(context).push(RoutePaths.movieDetails, extra: movie);
       },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16.r),
+        child: Stack(
+          alignment: Alignment.bottomLeft,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-                child: CachedNetworkImage(
-                  imageUrl: movie.posterPath ?? '',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey.shade200,
-                    child: Icon(Icons.broken_image, size: 40.r),
-                  ),
+            /// [Poster]
+            CachedNetworkImage(
+              imageUrl: movie.posterPath ?? '',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: 180.h,
+              placeholder: (context, url) => Container(
+                height: 180.h,
+                color: Colors.grey.shade300,
+                child: const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+              errorWidget: (context, url, error) => Container(
+                height: 180.h,
+                color: Colors.grey.shade200,
+                child: Icon(Icons.broken_image, size: 40.r),
+              ),
+            ),
+
+            Container(
+              height: 180.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
                 ),
               ),
             ),
+
+            /// [Movie title]
             Padding(
-              padding: EdgeInsets.all(8.r),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    movie.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  4.hb,
-                  Text(
-                    "Release: ${movie.releaseDate}",
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                  ),
-                  2.hb,
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 14.r),
-                      4.wb,
-                      Text(
-                        movie.voteAverage?.toStringAsFixed(1) ?? 'N/A',
-                        style: TextStyle(fontSize: 12.sp),
-                      ),
-                    ],
-                  ),
-                ],
+              padding: EdgeInsets.all(12.r),
+              child: Text(
+                movie.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.sp,
+                ),
               ),
             ),
           ],
