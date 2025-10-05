@@ -6,8 +6,6 @@ import 'package:moviedb_task/core/utils/router/router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
@@ -38,14 +36,6 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  Locale? _locale;
-
-  void setLocale(Locale value) {
-    setState(() {
-      _locale = value;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -53,16 +43,14 @@ class MyAppState extends State<MyApp> {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return ProviderApp(locale: _locale);
+        return ProviderApp();
       },
     );
   }
 }
 
 class ProviderApp extends StatefulWidget {
-  const ProviderApp({required this.locale, super.key});
-
-  final Locale? locale;
+  const ProviderApp({super.key});
 
   @override
   State<ProviderApp> createState() => _ProviderAppState();
